@@ -1,2 +1,2 @@
 # Belajara_Java
-Buar Belajar
+Buat Belajar
