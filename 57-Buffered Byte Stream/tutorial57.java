@@ -35,7 +35,7 @@ public class tutorial57 {
 
         //baca Ulang
         bufferInput.reset();
-        byte[] data = bufferInput.read();
+        byte[] data = bufferInput.readAllBytes();
         String dataString = new String(data);
         System.out.println(dataString);
     }
