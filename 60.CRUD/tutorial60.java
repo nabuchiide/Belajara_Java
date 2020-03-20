@@ -1,6 +1,8 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-
+import java.util.StringTokenizer;
 /**
  * tutorial60
  */
@@ -54,9 +56,39 @@ public class tutorial60 {
     }
 
     private static void tampilkanData() throws IOException {
-        System.out.println("ini isi dari data brother");
+        // System.out.println("ini isi dari data brother");
 
-        boolean tampilkanData = getYeseOrNo("Apakah Anda Ingin Menambahkan ?");
+        // boolean tampilkanData = getYeseOrNo("Apakah Anda Ingin Menambahkan ?");
+
+        FileReader fileInput;
+        BufferedReader bufferInput; //membuat file BufferReader
+        try {
+            fileInput = new FileReader("database.txt");
+            bufferInput = new BufferedReader(fileInput);
+        } catch (Exception e) {
+            //TODO: handle exception
+            System.err.println("Data Base Tidak Ditemukan");
+            System.err.println("Silahkan Tambah Data terlebih dahulu");
+            return;
+        }
+        String data = bufferInput.readLine();
+        System.out.println("\n| No |\tTahun |\tPengarang            |\tPenerbit             |\tJudul Buku");
+        System.out.println("==============================================================================");
+        int numberData=1;
+        while (data != null) { // apabila data tidak null 
+            StringTokenizer stringToken = new StringTokenizer(data,",");
+            stringToken.nextToken();
+            System.out.printf("| %2d ",numberData);
+            System.out.printf("|\t%4s  ",stringToken.nextToken());
+            System.out.printf("|\t%-20s ",stringToken.nextToken());
+            System.out.printf("|\t%-20s ",stringToken.nextToken());
+            System.out.printf("|\t%s ",stringToken.nextToken());
+            System.out.print("\n");
+            numberData++;
+    
+            data = bufferInput.readLine();
+        }
+        System.out.println("==============================================================================");
     }
 
     private static void clearScreen() {
