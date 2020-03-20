@@ -1,8 +1,11 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
 /**
  * tutorial60
  */
@@ -33,6 +36,7 @@ public class tutorial60 {
                     break;
                 case "2":
                     System.out.println("Cari Data Buku");
+                    cariData();
                     // cari data
                     break;
                 case "3":
@@ -55,18 +59,72 @@ public class tutorial60 {
 
     }
 
+    private static void cariData() throws IOException {
+
+        // membaca database ada atau tidak
+        try {
+            File file = new File("database.txt");
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.err.println("Database Tidak Ditemukan");
+            System.err.println("Silahkan tambah data terlebih dahulu");
+            return;
+        }
+
+        // kita ambil data dari user
+        Scanner terminalInput = new Scanner(System.in);
+        System.out.print("Masukan Kata Kunci untuk Mencari Buku : ");
+        String cariString = terminalInput.nextLine();
+        String[] keywords = cariString.split("\\s");
+
+        // mengecek keywords di database
+        cekBukuDiDatabase(keywords);
+    }
+
+    private static void cekBukuDiDatabase(String[] keywords) throws IOException {
+        FileReader fileInput = new FileReader("database.txt");
+        BufferedReader bufferInput = new BufferedReader(fileInput);
+
+        String data = bufferInput.readLine();
+        boolean isExsist;
+        int numberData = 1;
+        System.out.println("\n| No |\tTahun |\tPengarang            |\tPenerbit             |\tJudul Buku");
+        System.out.println("==============================================================================");
+        while (data != null) {
+            // cek Keywords di dalam baris
+            isExsist = true;
+
+            for (String keyword : keywords) {
+                isExsist = isExsist && data.toLowerCase().contains(keyword.toLowerCase());
+            }
+            // Jika Keyword nya cocok maka tampilkan
+            if (isExsist) {
+                StringTokenizer stringToken = new StringTokenizer(data, ",");
+                stringToken.nextToken();
+                System.out.printf("| %2d ", numberData);
+                System.out.printf("|\t%4s  ", stringToken.nextToken());
+                System.out.printf("|\t%-20s ", stringToken.nextToken());
+                System.out.printf("|\t%-20s ", stringToken.nextToken());
+                System.out.printf("|\t%s ", stringToken.nextToken());
+                System.out.print("\n");
+                numberData++;
+            }
+            data = bufferInput.readLine();
+        }
+    }
+
     private static void tampilkanData() throws IOException {
         // System.out.println("ini isi dari data brother");
 
         // boolean tampilkanData = getYeseOrNo("Apakah Anda Ingin Menambahkan ?");
 
         FileReader fileInput;
-        BufferedReader bufferInput; //membuat file BufferReader
+        BufferedReader bufferInput; // membuat file BufferReader
         try {
             fileInput = new FileReader("database.txt");
             bufferInput = new BufferedReader(fileInput);
         } catch (Exception e) {
-            //TODO: handle exception
+            // TODO: handle exception
             System.err.println("Data Base Tidak Ditemukan");
             System.err.println("Silahkan Tambah Data terlebih dahulu");
             return;
@@ -74,18 +132,18 @@ public class tutorial60 {
         String data = bufferInput.readLine();
         System.out.println("\n| No |\tTahun |\tPengarang            |\tPenerbit             |\tJudul Buku");
         System.out.println("==============================================================================");
-        int numberData=1;
-        while (data != null) { // apabila data tidak null 
-            StringTokenizer stringToken = new StringTokenizer(data,",");
+        int numberData = 1;
+        while (data != null) { // apabila data tidak null
+            StringTokenizer stringToken = new StringTokenizer(data, ",");
             stringToken.nextToken();
-            System.out.printf("| %2d ",numberData);
-            System.out.printf("|\t%4s  ",stringToken.nextToken());
-            System.out.printf("|\t%-20s ",stringToken.nextToken());
-            System.out.printf("|\t%-20s ",stringToken.nextToken());
-            System.out.printf("|\t%s ",stringToken.nextToken());
+            System.out.printf("| %2d ", numberData);
+            System.out.printf("|\t%4s  ", stringToken.nextToken());
+            System.out.printf("|\t%-20s ", stringToken.nextToken());
+            System.out.printf("|\t%-20s ", stringToken.nextToken());
+            System.out.printf("|\t%s ", stringToken.nextToken());
             System.out.print("\n");
             numberData++;
-    
+
             data = bufferInput.readLine();
         }
         System.out.println("==============================================================================");
