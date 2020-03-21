@@ -4,3 +4,6 @@ Purcell_2009_1,2009,Purcell,wiley,calculus
 faqihza_2019_1,2019,faqihza,Gramedia,Belajar C++
 faqihza_2019_2,2019,faqihza,Gramedia,Belajar Phyton
 faqihza_2019_3,2019,faqihza,Gramedia,Belajar Java
+Faqihza_2020_1,2020,Faqihza,Kelas Terbuka,Membagi Waktu Belajar
+Faqihza_2019_4,2019,Faqihza,Gramedia,Belajar Berlari
+faqihza_2018_1,2018,faqihza,Gramedia,Belajar Matlab

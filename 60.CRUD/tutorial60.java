@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Year;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -10,53 +13,51 @@ import java.util.StringTokenizer;
  * tutorial60
  */
 public class tutorial60 {
+    private static void tambahData() throws IOException {
+        FileWriter fileOutput = new FileWriter("database.txt", true);
+        BufferedWriter bufferOutput = new BufferedWriter(fileOutput);
 
-    public static void main(final String[] args) throws IOException {
+        Scanner terminalInput = new Scanner(System.in);
+        String penulis, judul, penerbit, tahun;
 
-        final Scanner terminalInput = new Scanner(System.in);
-        String pilihanUser;
-        boolean isLanjutkan = true;
+        System.out.print("Masukan nama penulis : ");
+        penulis = terminalInput.nextLine();
+        System.out.print("Masukan Judul Buku : ");
+        judul = terminalInput.nextLine();
+        System.out.print("Masukan nama penerbit : ");
+        penerbit = terminalInput.nextLine();
+        System.out.print("Masukan tahun terbit, Format (YYYY) : ");
+        tahun = ambilTahun();
+        // cek buku dalam database
+        String[] keywords = { tahun + "," + penulis + "," + penerbit + "," + judul };
+        System.out.println(Arrays.toString(keywords));
+        boolean isExsist = cekBukuDiDatabase(keywords, false);
+        // Menulis buku di database
+        if (isExsist == false) {
+            // fiersabesari_2012_1,2012,fiersa besari,media kita,jejak langkah
+            System.out.println(ambilEntryPerTahun(penulis, tahun));
+            long nomorEntry = ambilEntryPerTahun(penulis, tahun) + 1;
+            String penulisTanpaSpasi = penulis.replaceAll("\\s+", "");
+            String primaryKey = penulisTanpaSpasi + "_" + tahun + "_" + nomorEntry;
+            System.out.println("data yang akan anda masukan adalah");
+            System.out.println("_____________________________________");
+            System.out.println("Primary Key\t: " + primaryKey);
+            System.out.println("Tahun terbit\t: " + tahun);
+            System.out.println("Penulis Buku\t: " + penulis);
+            System.out.println("Judul Buku\t: " + judul);
+            System.out.println("Penerbit\t: " + penerbit);
 
-        while (isLanjutkan) {
-            clearScreen();
-            System.out.println("database Perpustakaan\n");
-            System.out.println("1.\tLihat Seluruh Buku");
-            System.out.println("2.\tCari Data Buku");
-            System.out.println("3.\tTambah Data Buku");
-            System.out.println("4.\tUbah Data Buku");
-            System.out.println("5.\tHapus Data Buku");
-
-            System.out.print("\n\nPilihan Anda : ");
-            pilihanUser = terminalInput.next();
-
-            switch (pilihanUser) {
-                case "1":
-                    System.out.println("List Seluruh Buku");
-                    tampilkanData();
-                    break;
-                case "2":
-                    System.out.println("Cari Data Buku");
-                    cariData();
-                    // cari data
-                    break;
-                case "3":
-                    System.out.println("Tambah Data Buku");
-                    // tambah data
-                    break;
-                case "4":
-                    System.out.println("Ubah Data Buku");
-                    // Ubah Data
-                    break;
-                case "5":
-                    System.out.println("Hapus Data Buku");
-                    // Hapus DAta
-                    break;
-                default:
-                    System.out.println("\n\nInput Anda Tidak Ditemukan Silahkan pilih satu sampai lima");
+            boolean isTambah = getYeseOrNo("Apakah Anda ingin menambah data tersebut");
+            if (isTambah) {
+                bufferOutput.write(primaryKey + "," + tahun + "," + penulis + "," + penerbit + "," + judul);
+                bufferOutput.newLine();
+                bufferOutput.flush();
             }
-            isLanjutkan = getYeseOrNo("Apakah Anda Ingin Melanjutkan ?");
+        } else {
+            System.out.println("Buku yang akan anda masukan sudah tersedia di database dengan data berikut : ");
+            cekBukuDiDatabase(keywords, true);
         }
-
+        bufferOutput.close();
     }
 
     private static void cariData() throws IOException {
@@ -78,39 +79,7 @@ public class tutorial60 {
         String[] keywords = cariString.split("\\s");
 
         // mengecek keywords di database
-        cekBukuDiDatabase(keywords);
-    }
-
-    private static void cekBukuDiDatabase(String[] keywords) throws IOException {
-        FileReader fileInput = new FileReader("database.txt");
-        BufferedReader bufferInput = new BufferedReader(fileInput);
-
-        String data = bufferInput.readLine();
-        boolean isExsist;
-        int numberData = 1;
-        System.out.println("\n| No |\tTahun |\tPengarang            |\tPenerbit             |\tJudul Buku");
-        System.out.println("==============================================================================");
-        while (data != null) {
-            // cek Keywords di dalam baris
-            isExsist = true;
-
-            for (String keyword : keywords) {
-                isExsist = isExsist && data.toLowerCase().contains(keyword.toLowerCase());
-            }
-            // Jika Keyword nya cocok maka tampilkan
-            if (isExsist) {
-                StringTokenizer stringToken = new StringTokenizer(data, ",");
-                stringToken.nextToken();
-                System.out.printf("| %2d ", numberData);
-                System.out.printf("|\t%4s  ", stringToken.nextToken());
-                System.out.printf("|\t%-20s ", stringToken.nextToken());
-                System.out.printf("|\t%-20s ", stringToken.nextToken());
-                System.out.printf("|\t%s ", stringToken.nextToken());
-                System.out.print("\n");
-                numberData++;
-            }
-            data = bufferInput.readLine();
-        }
+        cekBukuDiDatabase(keywords, true);
     }
 
     private static void tampilkanData() throws IOException {
@@ -127,6 +96,7 @@ public class tutorial60 {
             // TODO: handle exception
             System.err.println("Data Base Tidak Ditemukan");
             System.err.println("Silahkan Tambah Data terlebih dahulu");
+            tambahData();
             return;
         }
         String data = bufferInput.readLine();
@@ -147,6 +117,156 @@ public class tutorial60 {
             data = bufferInput.readLine();
         }
         System.out.println("==============================================================================");
+    }
+
+    private static void hapusData() throws IOException {
+
+    }
+
+    public static void main(final String[] args) throws IOException {
+
+        final Scanner terminalInput = new Scanner(System.in);
+        String pilihanUser;
+        boolean isLanjutkan = true;
+
+        while (isLanjutkan) {
+            clearScreen();
+            System.out.println("database Perpustakaan\n");
+            System.out.println("1.\tLihat Seluruh Buku");
+            System.out.println("2.\tCari Data Buku");
+            System.out.println("3.\tTambah Data Buku");
+            System.out.println("4.\tUbah Data Buku");
+            System.out.println("5.\tHapus Data Buku");
+
+            System.out.print("\n\nPilihan Anda : ");
+            pilihanUser = terminalInput.next();
+
+            switch (pilihanUser) {
+                case "1":
+                    System.out.println("\n====================");
+                    System.out.println("List Seluruh Buku");
+                    System.out.println("====================");
+                    // menampilkan data
+                    tampilkanData();
+                    break;
+                case "2":
+                    System.out.println("\n====================");
+                    System.out.println("Cari Data Buku");
+                    System.out.println("====================");
+                    // cari data
+                    cariData();
+                    break;
+                case "3":
+                    System.out.println("\n====================");
+                    System.out.println("Tambah Data Buku");
+                    System.out.println("====================");
+                    // tambah data
+                    tambahData();
+                    tampilkanData();
+                    break;
+                case "4":
+                    System.out.println("\n====================");
+                    System.out.println("Ubah Data Buku");
+                    System.out.println("====================");
+                    // Ubah Data
+                    break;
+                case "5":
+                    System.out.println("\n====================");
+                    System.out.println("Hapus Data Buku");
+                    System.out.println("====================");
+                    // Hapus DAta
+                    break;
+                default:
+                    System.out.println("\n\nInput Anda Tidak Ditemukan Silahkan pilih satu sampai lima");
+            }
+            isLanjutkan = getYeseOrNo("Apakah Anda Ingin Melanjutkan ?");
+        }
+
+    }
+
+    private static long ambilEntryPerTahun(String penulis, String tahun) throws IOException {
+        FileReader fileInput = new FileReader("database.txt");
+        BufferedReader bufferInput = new BufferedReader(fileInput);
+
+        long entry = 0;
+        String data = bufferInput.readLine();
+        Scanner dataScanner;
+        String primarykey;
+        while (data != null) {
+            dataScanner = new Scanner(data);
+            dataScanner.useDelimiter(",");
+            primarykey = dataScanner.next();
+            dataScanner = new Scanner(primarykey);
+            dataScanner.useDelimiter("_");
+
+            penulis = penulis.replace("\\s+", "");
+            if (penulis.equalsIgnoreCase(dataScanner.next()) && tahun.equalsIgnoreCase(dataScanner.next())) {
+                entry = dataScanner.nextInt();
+            }
+            data = bufferInput.readLine();
+        }
+        return entry;
+    }
+
+    private static String ambilTahun() throws IOException {
+        boolean tahunValid = false;
+        Scanner terminalInput = new Scanner(System.in);
+        String tahunInput = terminalInput.nextLine();
+        while (!tahunValid) {
+            try {
+                Year.parse(tahunInput);
+                tahunValid = true;
+            } catch (Exception e) {
+                // TODO: handle exception
+                System.out.println("Format tahun yang anda masukan salah");
+                System.out.print("Silahkan masukan tahun terbit kembali! : ");
+                tahunValid = true;
+                tahunInput = terminalInput.nextLine();
+            }
+        }
+        return tahunInput;
+    }
+
+    private static boolean cekBukuDiDatabase(String[] keywords, boolean isDisplay) throws IOException {
+        FileReader fileInput = new FileReader("database.txt");
+        BufferedReader bufferInput = new BufferedReader(fileInput);
+
+        String data = bufferInput.readLine();
+        boolean isExsist = false;
+        int numberData = 0;
+        if (isDisplay) {
+            System.out.println("\n| No |\tTahun |\tPengarang            |\tPenerbit             |\tJudul Buku");
+            System.out.println("==============================================================================");
+        }
+        while (data != null) {
+            // cek Keywords di dalam baris
+            isExsist = true;
+
+            for (String keyword : keywords) {
+                isExsist = isExsist && data.toLowerCase().contains(keyword.toLowerCase());
+            }
+            // Jika Keyword nya cocok maka tampilkan
+            if (isExsist) {
+                if (isDisplay) {
+                    numberData++;
+                    StringTokenizer stringToken = new StringTokenizer(data, ",");
+                    stringToken.nextToken();
+                    System.out.printf("| %2d ", numberData);
+                    System.out.printf("|\t%4s  ", stringToken.nextToken());
+                    System.out.printf("|\t%-20s ", stringToken.nextToken());
+                    System.out.printf("|\t%-20s ", stringToken.nextToken());
+                    System.out.printf("|\t%s ", stringToken.nextToken());
+                    System.out.print("\n");
+                } else {
+                    break;
+                }
+            }
+            data = bufferInput.readLine();
+        }
+        if (isDisplay) {
+            System.out.println("==============================================================================");
+        }
+        return isExsist;
     }
 
     private static void clearScreen() {
