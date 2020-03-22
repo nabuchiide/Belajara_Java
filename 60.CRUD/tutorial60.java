@@ -142,6 +142,7 @@ public class tutorial60 {
         int deleteNum = terminalInput.nextInt();
 
         // looping untuk membaca tiap data baris dan skip data yang akan didelete
+        boolean isFound = false;
         int entryCount = 0;
 
         String data = bufferInput.readLine();
@@ -163,6 +164,7 @@ public class tutorial60 {
                 System.out.println("Judul\t\t : " + st.nextToken());
 
                 isDelete = getYeseOrNo("Apakah anda yakin akan menghapus data dari database ?");
+                isFound = true;
             }
             if (isDelete) {
                 // Skip pindahkan data dari original
@@ -173,6 +175,10 @@ public class tutorial60 {
                 bufferOutput.newLine();
             }
             data = bufferInput.readLine();
+        }
+
+        if (!isFound) {
+            System.err.println("Buku tidak ditemukan");
         }
         // menulis data ke file
         bufferOutput.flush();
