@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
  * tutorial60
  */
 public class tutorial60 {
+
     private static void tambahData() throws IOException {
         FileWriter fileOutput = new FileWriter("database.txt", true);
         BufferedWriter bufferOutput = new BufferedWriter(fileOutput);
@@ -69,6 +70,7 @@ public class tutorial60 {
             // TODO: handle exception
             System.err.println("Database Tidak Ditemukan");
             System.err.println("Silahkan tambah data terlebih dahulu");
+            tambahData();
             return;
         }
 
@@ -119,8 +121,65 @@ public class tutorial60 {
         System.out.println("==============================================================================");
     }
 
-    private static void hapusData() throws IOException {
+    private static void deleteData() throws IOException {
+        // kita ambil database Original
+        File database = new File("database.txt");
+        FileReader fileInput = new FileReader(database);
+        BufferedReader bufferInput = new BufferedReader(fileInput);
 
+        // kita buat database sementara
+        File tempDB = new File("tempDB.txt");
+        FileWriter fileOutput = new FileWriter(tempDB);
+        BufferedWriter bufferOutput = new BufferedWriter(fileOutput);
+
+        // tampilkan data
+        System.out.println("List Buku");
+        tampilkanData();
+
+        // kita ambil user input untuk mendelete data
+        Scanner terminalInput = new Scanner(System.in);
+        System.out.print("\nMasukan nomor buku yang akan di hapus : ");
+        int deleteNum = terminalInput.nextInt();
+
+        // looping untuk membaca tiap data baris dan skip data yang akan didelete
+        int entryCount = 0;
+
+        String data = bufferInput.readLine();
+
+        while (data != null) {
+            entryCount++;
+            boolean isDelete = false;
+
+            StringTokenizer st = new StringTokenizer(data, ",");
+
+            // tampilkan data yang ingin di hapus
+            if (deleteNum == entryCount) {
+                System.out.println("\nData yang ingin anda hapus adalah ");
+                System.out.println("====================================\n");
+                System.out.println("Referensi\t : " + st.nextToken());
+                System.out.println("Tahun\t\t : " + st.nextToken());
+                System.out.println("Penulis\t\t : " + st.nextToken());
+                System.out.println("Penerbit\t : " + st.nextToken());
+                System.out.println("Judul\t\t : " + st.nextToken());
+
+                isDelete = getYeseOrNo("Apakah anda yakin akan menghapus data dari database ?");
+            }
+            if (isDelete) {
+                // Skip pindahkan data dari original
+                System.out.println("Data Berhasil dihapus");
+            } else {
+                // kita pindahkan data original ke sementara
+                bufferOutput.write(data);
+                bufferOutput.newLine();
+            }
+            data = bufferInput.readLine();
+        }
+        // menulis data ke file
+        bufferOutput.flush();
+        // delete Original file
+        database.delete();
+        // rename file sementara ke database
+        tempDB.renameTo(database);
     }
 
     public static void main(final String[] args) throws IOException {
@@ -174,6 +233,7 @@ public class tutorial60 {
                     System.out.println("\n====================");
                     System.out.println("Hapus Data Buku");
                     System.out.println("====================");
+                    deleteData();
                     // Hapus DAta
                     break;
                 default:
@@ -269,7 +329,7 @@ public class tutorial60 {
         return isExsist;
     }
 
-    private static void clearScreen() {
+    private static void clearScreen() throws IOException {
         try {
             if (System.getProperty("os.name").contains("windows")) {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -295,4 +355,5 @@ public class tutorial60 {
 
         return pilihanUser.equalsIgnoreCase("y");// untuk memberikan nilai true pada boolean isLanjutkan
     }
+
 }
