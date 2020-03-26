@@ -188,6 +188,122 @@ public class tutorial60 {
         tempDB.renameTo(database);
     }
 
+    private static void updateData() throws IOException {
+        // kita ambil database original
+        File database = new File("database.txt");
+        FileReader fileInput = new FileReader(database);
+        BufferedReader bufferInput = new BufferedReader(fileInput);
+
+        // kita buat database sementara
+        File tempDB = new File("tempDB.txt");
+        FileWriter fileOutput = new FileWriter(tempDB);
+        BufferedWriter bufferOutput = new BufferedWriter(fileOutput);
+
+        // tampilkan data
+        System.out.println("List Buku");
+        tampilkanData();
+
+        // ambil user input / pilihan data
+        Scanner terminalInput = new Scanner(System.in);
+        System.out.print("\nMasukan nomor buku yang akan diupdate: ");
+        int updateNum = terminalInput.nextInt();
+
+        // tampilkan data yang diupdate
+        String data = bufferInput.readLine();
+        int entryCount = 0;
+
+        while (data != null) {
+            entryCount++;
+            StringTokenizer st = new StringTokenizer(data, ",");
+
+            // tampilkan entry count apabila entrycount == updateNum
+            if (updateNum == entryCount) {
+                System.out.println("\nData yang ingin diupdate adalah ");
+                System.out.println("------------------------------------");
+                System.out.println("Referensi\t : " + st.nextToken());
+                System.out.println("Tahun\t\t : " + st.nextToken());
+                System.out.println("Penulis\t\t : " + st.nextToken());
+                System.out.println("Penerbit\t : " + st.nextToken());
+                System.out.println("Judul\t\t : " + st.nextToken());
+
+                // update data
+
+                // mengambil input dari user
+                String[] fieldData = { "tahun", "penulis", "penerbit", "judul" };
+                String[] tempData = new String[4];
+                // refresh token
+                st = new StringTokenizer(data, ",");
+                String originaData = st.nextToken();
+
+                for (int i = 0; i < fieldData.length; i++) {
+                    boolean isUpdate = getYeseOrNo("Apakah anda ingin merubah data terkait " + fieldData[i]);
+
+                    originaData = st.nextToken();
+                    if (isUpdate) {
+                        // user input
+                        if (fieldData[i].equalsIgnoreCase("tahun")) {
+                            System.out.print("Masukan tahun terbit, format=(YYYY): ");
+                            tempData[i] = ambilTahun();
+                        } else {
+                            terminalInput = new Scanner(System.in);
+                            System.out.print("\nMasukan " + fieldData[i] + " baru : ");
+                            tempData[i] = terminalInput.nextLine();
+                        }
+                    } else {
+                        tempData[i] = originaData;
+                    }
+                }
+                // tampilkan data baru ke layar
+                st = new StringTokenizer(data, ",");
+                st.nextToken();
+                System.out.println("\nData baru anda adalah ");
+                System.out.println("------------------------------------");
+                System.out.println("Tahun\t\t : " + st.nextToken() + "-->" + tempData[0]);
+                System.out.println("Penulis\t\t : " + st.nextToken() + "-->" + tempData[1]);
+                System.out.println("Penerbit\t : " + st.nextToken() + "-->" + tempData[2]);
+                System.out.println("Judul\t\t : " + st.nextToken() + "-->" + tempData[3]);
+
+                System.out.println(Arrays.toString(tempData));
+                boolean isUpdate = getYeseOrNo("Apakah anda yakin ingin update data tersebut?");
+                if (isUpdate) {
+                    // cek data baru didatabase
+                    boolean isExsist = cekBukuDiDatabase(tempData, false);
+                    if (isExsist) {
+                        System.out.println(
+                                "data buku sudah ada didatabase, proses update dibatalakan,\nSilahkan delete data yang bersangkutan! ");
+                    } else {
+                        // format data baru kedalam database
+                        String tahun = tempData[0];
+                        String penulis = tempData[1];
+                        String penerbit = tempData[2];
+                        String judul = tempData[3];
+                        // kita buat primary key
+                        long nomorEntry = ambilEntryPerTahun(penulis, tahun) + 1;
+
+                        String penulisTanpaSpasi = penulis.replaceAll("\\s+", "");
+                        String primaryKey = penulisTanpaSpasi + "_" + tahun + "_" + penulis + "_" + penerbit + "_"
+                                + judul;
+                        // tulis data ke database
+                        bufferOutput.write(primaryKey + "," + tahun + "," + penulis + "," + penerbit + "," + judul);
+                    }
+                } else {
+                    bufferOutput.write(data);
+                }
+            } else {
+                // copy data
+                bufferOutput.write(data);
+            }
+            bufferOutput.newLine();
+            data = bufferInput.readLine();
+        }
+        // menulis data kefile
+        bufferOutput.flush();
+        // delete data original
+        database.delete();
+        // rename file tempDB menjadi database
+        tempDB.renameTo(database);
+    }
+
     public static void main(final String[] args) throws IOException {
 
         final Scanner terminalInput = new Scanner(System.in);
@@ -234,6 +350,7 @@ public class tutorial60 {
                     System.out.println("Ubah Data Buku");
                     System.out.println("====================");
                     // Ubah Data
+                    updateData();
                     break;
                 case "5":
                     System.out.println("\n====================");
