@@ -18,17 +18,35 @@ class Player {
         this.weapon = weapon;
     }
 
-    void equipAromor(Armor armor){
+    void equipAromor(Armor armor) {
         this.armor = armor;
     }
 
-    void display(){
+    void display() {
         System.out.println("=================================");
-        System.out.println("Name : "+this.name);
-        System.out.println("Healt : "+this.healt+" HP");
+        System.out.println("Name : " + this.name);
+        System.out.println("Healt : " + this.healt + " HP");
         this.weapon.display();
         this.armor.display();
         System.out.println("=================================");
+    }
+
+    void Attack(Player opponent) {
+        double attackPower = this.weapon.attackPower;
+        System.out.println(this.name + " Attacking " + opponent.name + " With Power " + attackPower);
+        opponent.defence(attackPower);
+    }
+
+    void defence(double attackPower) {
+        // mengambil damage
+        double damage;
+        if (this.armor.defencePower < attackPower) {
+            damage = attackPower - this.armor.defencePower;
+        } else {
+            damage = 0;
+        }
+        this.healt -=damage;
+        System.out.println(this.name + " gets damage " + damage);
     }
 }
 
@@ -74,13 +92,24 @@ public class App {
         Armor bajuBesi = new Armor("Baju Besi", 10);
         Armor kaos = new Armor("Kaos", 0);
         // equip Senjata dan Armor
-            //Player 1
+        // Player 1
         player1.equipWeapon(pedang);
         player1.equipAromor(bajuBesi);
         player1.display();
-            //Player 2
+        System.out.println();
+        // Player 2
         player2.equipAromor(kaos);
         player2.equipWeapon(ketapel);
+        player2.display();
+
+        System.out.println("\nPertempuran");
+        System.out.println("\n>>>>>>> Episode -1 <<<<<<<<");
+        player1.Attack(player2);
+        player1.display();
+        player2.display();
+        System.out.println("\n>>>>>>> Episode -2 <<<<<<<<");
+        player2.Attack(player1);
+        player1.display();
         player2.display();
     }
 }
